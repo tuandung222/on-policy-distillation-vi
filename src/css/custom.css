@@ -1,0 +1,318 @@
+/* ============================================================
+   On-Policy Distillation VI — Premium Custom Stylesheet
+   Teal/Cyan Theme with Glassmorphism Design
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
+
+/* ── Light Mode Variables ─────────────────────────────────── */
+:root {
+  --ifm-color-primary: #0891b2;
+  --ifm-color-primary-dark: #0e7490;
+  --ifm-color-primary-darker: #155e75;
+  --ifm-color-primary-darkest: #164e63;
+  --ifm-color-primary-light: #22d3ee;
+  --ifm-color-primary-lighter: #67e8f9;
+  --ifm-color-primary-lightest: #a5f3fc;
+
+  --ifm-font-family-base: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --ifm-heading-font-family: 'Outfit', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --ifm-font-size-base: 16px;
+  --ifm-code-font-size: 92%;
+  --ifm-line-height-base: 1.75;
+
+  --ifm-navbar-height: 4rem;
+  --ifm-footer-background-color: #0c1222;
+
+  --glass-bg: rgba(255, 255, 255, 0.65);
+  --glass-border: rgba(8, 145, 178, 0.15);
+  --glass-shadow: 0 8px 32px rgba(8, 145, 178, 0.08);
+
+  --surface-bg: #f8fafb;
+  --surface-card: #ffffff;
+  --text-secondary: #475569;
+  --accent-glow: rgba(8, 145, 178, 0.12);
+
+  --docusaurus-highlighted-code-line-bg: rgba(8, 145, 178, 0.1);
+}
+
+/* ── Dark Mode Variables ──────────────────────────────────── */
+[data-theme='dark'] {
+  --ifm-color-primary: #22d3ee;
+  --ifm-color-primary-dark: #0891b2;
+  --ifm-color-primary-darker: #0e7490;
+  --ifm-color-primary-darkest: #155e75;
+  --ifm-color-primary-light: #67e8f9;
+  --ifm-color-primary-lighter: #a5f3fc;
+  --ifm-color-primary-lightest: #cffafe;
+
+  --ifm-background-color: #0a0f1e;
+  --ifm-background-surface-color: #111827;
+  --ifm-footer-background-color: #060a14;
+
+  --glass-bg: rgba(17, 24, 39, 0.72);
+  --glass-border: rgba(34, 211, 238, 0.12);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+
+  --surface-bg: #0a0f1e;
+  --surface-card: #111827;
+  --text-secondary: #94a3b8;
+  --accent-glow: rgba(34, 211, 238, 0.08);
+
+  --docusaurus-highlighted-code-line-bg: rgba(34, 211, 238, 0.12);
+}
+
+/* ── Global Base Styles ───────────────────────────────────── */
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  background-color: var(--surface-bg);
+  transition: background-color 0.3s ease;
+}
+
+/* ── Premium Typography ───────────────────────────────────── */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--ifm-heading-font-family);
+  letter-spacing: -0.025em;
+  font-weight: 700;
+}
+
+h1 {
+  font-weight: 900;
+  letter-spacing: -0.035em;
+}
+
+article p {
+  color: var(--text-secondary);
+  line-height: 1.8;
+}
+
+[data-theme='dark'] article p {
+  color: #cbd5e1;
+}
+
+/* ── Glassmorphism Panel ──────────────────────────────────── */
+.glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px) saturate(1.6);
+  -webkit-backdrop-filter: blur(16px) saturate(1.6);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  box-shadow: var(--glass-shadow);
+  padding: 2rem;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.3s ease;
+}
+
+.glass-panel:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 48px rgba(8, 145, 178, 0.12);
+  border-color: rgba(8, 145, 178, 0.3);
+}
+
+[data-theme='dark'] .glass-panel:hover {
+  box-shadow: 0 20px 48px rgba(34, 211, 238, 0.1);
+  border-color: rgba(34, 211, 238, 0.25);
+}
+
+/* ── Custom Hero Banner ───────────────────────────────────── */
+.custom-hero {
+  background: linear-gradient(135deg, #f0fdfa 0%, #e0f7fa 25%, #cffafe 50%, #e0f2fe 75%, #f0f9ff 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.custom-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 600px 400px at 20% 50%, rgba(8, 145, 178, 0.12), transparent),
+    radial-gradient(ellipse 500px 350px at 80% 30%, rgba(34, 211, 238, 0.10), transparent),
+    radial-gradient(ellipse 400px 300px at 50% 80%, rgba(6, 182, 212, 0.08), transparent);
+  pointer-events: none;
+}
+
+[data-theme='dark'] .custom-hero {
+  background: linear-gradient(135deg, #0a0f1e 0%, #0c1929 25%, #0e2333 50%, #0c1929 75%, #0a0f1e 100%);
+}
+
+[data-theme='dark'] .custom-hero::before {
+  background:
+    radial-gradient(ellipse 600px 400px at 20% 50%, rgba(34, 211, 238, 0.08), transparent),
+    radial-gradient(ellipse 500px 350px at 80% 30%, rgba(8, 145, 178, 0.06), transparent),
+    radial-gradient(ellipse 400px 300px at 50% 80%, rgba(6, 182, 212, 0.05), transparent);
+}
+
+/* ── Premium Navbar ───────────────────────────────────────── */
+.navbar {
+  backdrop-filter: blur(20px) saturate(1.8);
+  -webkit-backdrop-filter: blur(20px) saturate(1.8);
+  background: rgba(255, 255, 255, 0.78) !important;
+  border-bottom: 1px solid rgba(8, 145, 178, 0.08);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: all 0.3s ease;
+}
+
+[data-theme='dark'] .navbar {
+  background: rgba(10, 15, 30, 0.82) !important;
+  border-bottom: 1px solid rgba(34, 211, 238, 0.06);
+}
+
+.navbar__title {
+  font-family: var(--ifm-heading-font-family);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.navbar__link--active {
+  position: relative;
+}
+
+.navbar__link--active::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 2.5px;
+  background: linear-gradient(90deg, #0891b2, #22d3ee);
+  border-radius: 2px;
+}
+
+/* ── Sidebar Active Link ──────────────────────────────────── */
+.menu__link--active:not(.menu__link--sublist) {
+  background: var(--accent-glow);
+  border-left: 3px solid var(--ifm-color-primary);
+  font-weight: 600;
+}
+
+/* ── Custom Scrollbar ─────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(8, 145, 178, 0.25);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(8, 145, 178, 0.4);
+}
+
+[data-theme='dark'] ::-webkit-scrollbar-thumb {
+  background: rgba(34, 211, 238, 0.2);
+}
+
+[data-theme='dark'] ::-webkit-scrollbar-thumb:hover {
+  background: rgba(34, 211, 238, 0.35);
+}
+
+/* ── Code Blocks ──────────────────────────────────────────── */
+.prism-code {
+  border-radius: 12px !important;
+  border: 1px solid var(--glass-border) !important;
+}
+
+[data-theme='dark'] .prism-code {
+  background: #0d1117 !important;
+}
+
+/* ── Docs Page Enhancements ───────────────────────────────── */
+.markdown h1:first-child {
+  font-size: 2.4rem;
+  background: linear-gradient(135deg, #0891b2, #22d3ee, #06b6d4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+[data-theme='dark'] .markdown h1:first-child {
+  background: linear-gradient(135deg, #22d3ee, #67e8f9, #a5f3fc);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Admonition/Alert Enhancements ────────────────────────── */
+.alert {
+  border-radius: 12px;
+  backdrop-filter: blur(8px);
+}
+
+/* ── Table Enhancements ───────────────────────────────────── */
+table {
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--glass-border);
+}
+
+table thead tr {
+  background: var(--accent-glow);
+}
+
+/* ── Selection Color ──────────────────────────────────────── */
+::selection {
+  background: rgba(8, 145, 178, 0.25);
+  color: inherit;
+}
+
+[data-theme='dark'] ::selection {
+  background: rgba(34, 211, 238, 0.25);
+}
+
+/* ── Link Hover Effects ───────────────────────────────────── */
+.markdown a {
+  text-decoration-color: rgba(8, 145, 178, 0.3);
+  text-underline-offset: 3px;
+  transition: text-decoration-color 0.2s ease;
+}
+
+.markdown a:hover {
+  text-decoration-color: var(--ifm-color-primary);
+}
+
+/* ── Pagination ───────────────────────────────────────────── */
+.pagination-nav__link {
+  border-radius: 12px;
+  border: 1px solid var(--glass-border);
+  transition: all 0.3s ease;
+}
+
+.pagination-nav__link:hover {
+  border-color: var(--ifm-color-primary);
+  box-shadow: 0 4px 16px var(--accent-glow);
+}
+
+/* ── TOC Sidebar ──────────────────────────────────────────── */
+.table-of-contents__link--active {
+  font-weight: 600;
+  color: var(--ifm-color-primary);
+}
+
+/* ── KaTeX Display Math ───────────────────────────────────── */
+.katex-display {
+  padding: 1rem;
+  border-radius: 12px;
+  background: var(--accent-glow);
+  overflow-x: auto;
+}
+
+/* ── Mermaid Diagrams ─────────────────────────────────────── */
+.docusaurus-mermaid-container {
+  text-align: center;
+  margin: 1.5rem 0;
+}
