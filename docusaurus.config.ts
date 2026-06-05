@@ -52,9 +52,9 @@ const config: Config = {
 
   stylesheets: [
     {
-      href: 'https://cdn.jsdelivr.net/npm/katex@0.17.0/dist/katex.min.css',
+      href: 'https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css',
       type: 'text/css',
-      integrity: 'sha384-A7p14lI4Xr64x4YPm5yP0mMRzrkpAEbgZrN4pel3kNTGMHdf0hGgMPmESaGGfkO',
+      integrity: 'sha384-GvrOXuhMATgEsSwCs4smul74iXGOixntILdUW9XmUC6+HX0sLNAK3q71HotJqlAn',
       crossorigin: 'anonymous',
     },
   ],
