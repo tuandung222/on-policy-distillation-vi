@@ -5,15 +5,15 @@ sidebar_label: 'Chương 6: So sánh với GRPO'
 
 # Chương 6: On-Policy Distillation Vượt trội so với GRPO
 
-Chương này so sánh phương pháp **on-policy distillation** (chưng cất trên chính sách hiện hành) với **GRPO** (Group Relative Policy Optimization — Tối ưu hóa Chính sách Tương đối theo Nhóm), một phương pháp **RL** (Reinforcement Learning — Học tăng cường) phổ biến. Kết quả cho thấy chưng cất tri thức on-policy vượt trội đáng kể so với GRPO trong cả hai kịch bản cùng và khác tokenizer.
+Chương này so sánh **on-policy distillation** với **GRPO** (Group Relative Policy Optimization), một phương pháp RL phổ biến. Kết quả cho thấy chưng cất tri thức on-policy vượt trội đáng kể so với GRPO trong cả hai kịch bản cùng và khác tokenizer.
 
 ---
 
 ## 6.1 Tại sao So sánh với GRPO?
 
-**On-policy distillation** sử dụng các đoạn hoàn thành (completions) do student tự sinh ra để cập nhật dữ liệu huấn luyện một cách liên tục. Sau khi đã chứng minh rằng cách tiếp cận này vượt trội so với các phương pháp **offline** như SFT (Supervised Fine-Tuning), chúng tôi tiến hành so sánh nó với **GRPO**.
+On-policy distillation dùng chính các completions do student sinh ra để liên tục cập nhật dữ liệu huấn luyện. Sau khi đã chứng minh rằng cách tiếp cận này vượt trội so với SFT, chúng tôi tiến hành so sánh với **GRPO**.
 
-**GRPO** là phương pháp RL được giới thiệu trong bài báo **DeepSeek-Math** (Shao và cộng sự, 2024) và sau đó trở nên phổ biến rộng rãi nhờ bản phát hành **DeepSeek R1**. GRPO tối ưu hóa chính sách bằng cách so sánh phần thưởng tương đối giữa các ứng viên trong cùng một nhóm, thay vì sử dụng một mô hình giá trị (value model) riêng biệt.
+**GRPO** được giới thiệu trong bài báo **DeepSeek-Math** (Shao et al., 2024) và trở nên phổ biến rộng rãi nhờ **DeepSeek R1**. GRPO tối ưu chính sách bằng cách so sánh phần thưởng tương đối giữa các ứng viên trong cùng một nhóm, thay vì dùng một value model riêng biệt.
 
 ```mermaid
 graph TD
@@ -38,15 +38,15 @@ graph TD
 
 ## 6.2 Thiết kế Hàm Phần thưởng (Reward Function)
 
-Chúng tôi tuân theo hướng dẫn của **Philipp Schmid** về cách huấn luyện GRPO cho bài toán **Countdown**. Hàm phần thưởng (reward function) của chúng tôi là **tổng của ba thành phần**:
+Chúng tôi tuân theo hướng dẫn của **Philipp Schmid** về cách huấn luyện GRPO cho bài toán Countdown. Hàm phần thưởng là **tổng của ba thành phần**:
 
 | # | Thành phần | Điểm | Mô tả |
 |:---:|:---|:---:|:---|
-| 1 | **Format** (Định dạng) | +1 | Nếu phản hồi bao gồm các thẻ đáp án (answer tags) đúng cách |
-| 2 | **Following Rules** (Tuân thủ Quy tắc) | +1 | Nếu mô hình tuân thủ quy tắc sử dụng các số được cung cấp và chỉ sử dụng mỗi số một lần |
-| 3 | **Correct Equation** (Phương trình Đúng) | +1 | Nếu phương trình đưa ra là đúng |
+| 1 | **Format** | +1 | Nếu phản hồi có các thẻ answer đúng cách |
+| 2 | **Following Rules** | +1 | Nếu mô hình dùng đúng các số được cung cấp, mỗi số đúng một lần |
+| 3 | **Correct Equation** | +1 | Nếu phương trình đưa ra là đúng |
 
-> **Lưu ý kỹ thuật:** Bài hướng dẫn gốc gộp phần thưởng **Format** và **Following Rules** vào một hàm duy nhất, nhưng chúng tôi nhận thấy kết quả tốt hơn khi **tách riêng** chúng thành hai hàm phần thưởng độc lập. Việc tách riêng giúp mô hình nhận tín hiệu phản hồi rõ ràng hơn cho từng khía cạnh.
+> **Lưu ý kỹ thuật:** Hướng dẫn gốc gộp Format và Following Rules vào một hàm duy nhất, nhưng chúng tôi nhận thấy kết quả tốt hơn khi **tách riêng** chúng. Việc tách riêng giúp mô hình nhận tín hiệu phản hồi rõ ràng hơn cho từng khía cạnh.
 
 ---
 
@@ -58,7 +58,7 @@ Kết quả cho kịch bản cùng tokenizer cho thấy **KD vượt trội GRPO
 
 ### Kịch bản 2: Khác Tokenizer
 
-Kịch bản với tokenizer khác nhau có khoảng cách hẹp hơn nhưng **GOLD vẫn vượt trội GRPO 20%**.
+Kịch bản khác tokenizer có khoảng cách hẹp hơn nhưng **GOLD vẫn vượt trội GRPO 20%**.
 
 ---
 
@@ -82,7 +82,7 @@ Bảng dưới đây tổng hợp hiệu suất của tất cả các phương p
 | **GOLD** | On-Policy KD | ✅ | **+25%** | **60%** |
 | **GRPO** | On-Policy RL | N/A | Trung bình | — |
 
-### So sánh Tổng thể Các Phương pháp
+### So sánh Tổng thể
 
 | Tiêu chí | GKD | ULD | GOLD | GRPO |
 |:---|:---:|:---:|:---:|:---:|
@@ -115,7 +115,7 @@ graph TD
 
 ## 6.5 Phân tích và Ý nghĩa
 
-Những kết quả này **phù hợp với Báo cáo Kỹ thuật Qwen 3** (Qwen 3 Technical Report), trong đó on-policy distillation cho hiệu suất tương đương hoặc tốt hơn RL. Tuy nhiên, kết quả của chúng tôi **đi xa hơn một bước** vì chúng tôi đạt hiệu suất tốt hơn RL khi sử dụng cặp student-teacher **từ các họ mô hình khác nhau** và **với các tokenizer khác nhau**.
+Những kết quả này **phù hợp với Báo cáo Kỹ thuật Qwen 3**, trong đó on-policy distillation cho hiệu suất tương đương hoặc tốt hơn RL. Tuy nhiên, chúng tôi **đi xa hơn một bước** vì đạt hiệu suất tốt hơn RL ngay cả khi student và teacher đến từ **các họ mô hình khác nhau** với **tokenizer khác nhau**.
 
 ### Tại sao On-Policy KD vượt trội GRPO?
 
@@ -141,9 +141,9 @@ graph LR
 
 Có hai lý do chính:
 
-1. **Tín hiệu giám sát dày đặc hơn (Denser supervision signal):** KD cung cấp phân phối xác suất đầy đủ từ teacher cho mỗi token, trong khi GRPO chỉ nhận tín hiệu phần thưởng ở cấp chuỗi (sequence-level reward). Điều này giúp gradient trong KD có **variance thấp hơn** và mô hình hội tụ nhanh hơn.
+1. **Tín hiệu giám sát dày đặc hơn:** KD cung cấp phân phối xác suất đầy đủ từ teacher cho mỗi token, trong khi GRPO chỉ nhận tín hiệu phần thưởng ở cấp chuỗi. Gradient trong KD vì vậy có **variance thấp hơn** và mô hình hội tụ nhanh hơn.
 
-2. **Không cần thiết kế reward function:** GRPO yêu cầu thiết kế hàm phần thưởng cẩn thận cho từng bài toán. KD chỉ cần một teacher đủ tốt — tri thức của teacher tự nhiên chứa đựng tín hiệu huấn luyện phong phú.
+2. **Không cần thiết kế reward function:** GRPO đòi hỏi thiết kế hàm phần thưởng cẩn thận cho từng bài toán. KD chỉ cần một teacher đủ tốt — tri thức của teacher tự nhiên chứa đựng tín hiệu huấn luyện phong phú.
 
 ---
 

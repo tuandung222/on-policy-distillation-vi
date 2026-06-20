@@ -9,11 +9,11 @@ sidebar_label: 'Chương 8: Kết luận & Tài liệu tham khảo'
 
 ## 8.1 Kết luận
 
-Trong bài viết này, chúng tôi đã giới thiệu **GOLD** (General On-Policy Logit Distillation — Chưng cất Logit On-Policy Tổng quát), một phương pháp mới cho phép **chưng cất tri thức on-policy hiệu quả giữa các mô hình**, ngay cả khi teacher và student **không chia sẻ cùng từ vựng tokenizer**.
+Trong bài viết này, chúng tôi đã giới thiệu **GOLD** (General On-Policy Logit Distillation) — phương pháp cho phép **chưng cất tri thức on-policy hiệu quả giữa các mô hình**, ngay cả khi teacher và student **không dùng chung tokenizer**.
 
 ### GOLD Được Xây dựng trên ULD
 
-GOLD được xây dựng dựa trên phương pháp **ULD** (Universal Logit Distillation — Chưng cất Logit Phổ quát) offline nhưng **mở rộng nó sang bối cảnh on-policy** và giải quyết **hai điểm yếu chính** của ULD:
+GOLD kế thừa nền tảng của **ULD** offline nhưng **mở rộng sang bối cảnh on-policy** và khắc phục **hai điểm yếu chính** của ULD:
 
 ```mermaid
 graph TD
@@ -36,15 +36,15 @@ graph TD
     style S2 fill:#4CAF50,color:#fff
 ```
 
-**Thứ nhất**, chúng tôi thay thế phương pháp **cắt ngắn chuỗi thô sơ** (naive sequence truncation) của ULD bằng **chiến lược gộp token** (token-merging strategy). Chiến lược này nhân các **phân phối biên** (marginal distributions) với các **xác suất điều kiện vô hướng** (scalar conditional probabilities), cho phép xử lý sự khác biệt về phân đoạn chuỗi giữa hai tokenizer một cách chính xác hơn.
+**Thứ nhất**, chúng tôi thay thế phương pháp cắt ngắn chuỗi của ULD bằng **chiến lược gộp token** (token-merging). Chiến lược này nhân các phân phối biên (marginal distributions) với các xác suất có điều kiện vô hướng (scalar conditional probabilities), xử lý chính xác sự khác biệt phân đoạn giữa hai tokenizer.
 
-**Thứ hai**, chúng tôi triển khai **phương pháp căn chỉnh từ vựng lai** (hybrid vocabulary alignment method). Phương pháp này sử dụng **hàm mất mát ánh xạ trực tiếp** (direct-mapping loss) cho các token được chia sẻ giữa hai tokenizer, và chỉ **quay lại phương pháp sắp xếp** (sorting method) của ULD cho các token không khớp (unmatched tokens).
+**Thứ hai**, chúng tôi triển khai **phương pháp căn chỉnh từ vựng lai** (hybrid vocabulary alignment). Phương pháp này dùng direct-mapping loss cho các token được chia sẻ giữa hai tokenizer, và chỉ dùng sorting fallback của ULD cho các token không khớp.
 
 ---
 
 ## 8.2 Tổng hợp Kết quả Thí nghiệm
 
-Các thí nghiệm trên bài toán Countdown xác nhận những ưu điểm của GOLD:
+Các thí nghiệm trên bài toán Countdown xác nhận ưu điểm của GOLD:
 
 ### Kết quả Chính
 
@@ -53,7 +53,7 @@ Các thí nghiệm trên bài toán Countdown xác nhận những ưu điểm c�
 | **GOLD vượt trội ULD** | Khôi phục **60%** hiệu suất teacher, so với chỉ **10%** của ULD |
 | **GOLD vượt trội SFT** | Cải thiện hơn SFT **15%** |
 | **GOLD vượt trội GRPO** | Hiệu suất gấp **2 lần** so với GRPO (cùng tokenizer) |
-| **Cross-tokenizer** | Ngay cả trong kịch bản khó (khác tokenizer), GOLD vẫn vượt trội GRPO **20%** |
+| **Cross-tokenizer** | Ngay cả trong kịch bản khác tokenizer, GOLD vẫn vượt trội GRPO **20%** |
 
 ```mermaid
 graph LR
@@ -72,9 +72,9 @@ graph LR
 
 ### Ý nghĩa
 
-Những phát hiện này chứng minh rằng GOLD là một kỹ thuật **mạnh mẽ và linh hoạt** cho chưng cất mô hình. Nó cung cấp con đường để **chưng cất tri thức từ bất kỳ teacher hiệu suất cao nào sang bất kỳ student nào**, bất kể tokenizer của chúng, mang đến một giải pháp thay thế **hiệu quả hơn và tiết kiệm token hơn** so với học tăng cường (reinforcement learning).
+Những phát hiện này chứng minh GOLD là kỹ thuật **mạnh mẽ và linh hoạt** cho chưng cất mô hình. GOLD mở ra con đường để **chưng cất tri thức từ bất kỳ teacher nào sang bất kỳ student nào** — bất kể tokenizer của chúng — đồng thời là giải pháp thay thế **hiệu quả và tiết kiệm token hơn** so với reinforcement learning.
 
-> **Tầm nhìn:** GOLD mở ra khả năng chưng cất tri thức tự do giữa các họ mô hình (model families) — ví dụ từ Qwen sang LLaMA, từ GPT sang Mistral — mà không bị ràng buộc bởi sự khác biệt tokenizer. Đây là bước tiến quan trọng hướng tới việc dân chủ hóa tri thức AI.
+> **Tầm nhìn:** GOLD cho phép chưng cất tự do giữa các họ mô hình khác nhau — ví dụ từ Qwen sang LLaMA, từ GPT sang Mistral — mà không bị ràng buộc bởi sự khác biệt tokenizer. Đây là bước tiến quan trọng hướng tới dân chủ hóa tri thức AI.
 
 ---
 
@@ -121,11 +121,11 @@ Bản dịch tiếng Việt này được thực hiện bởi **[tuandung222](ht
 | Thông tin | Chi tiết |
 |:---|:---|
 | **Người dịch** | tuandung222 |
-| **Nguồn gốc** | Bài blog *"Unlocking On-Policy Distillation for Any Model Family"* của Hugging Face |
+| **Nguồn gốc** | Bài blog *\"Unlocking On-Policy Distillation for Any Model Family\"* của Hugging Face |
 | **Mục đích** | Phổ biến kiến thức về chưng cất tri thức on-policy cho cộng đồng AI Việt Nam |
-| **Nguyên tắc dịch** | Giữ nguyên các thuật ngữ kỹ thuật quan trọng bằng tiếng Anh, kèm giải thích tiếng Việt khi giới thiệu lần đầu |
+| **Nguyên tắc dịch** | Giữ nguyên thuật ngữ kỹ thuật tiếng Anh, kèm giải thích tiếng Việt khi giới thiệu lần đầu |
 
-> **Lưu ý:** Bản dịch này nhằm mục đích giáo dục và phổ biến kiến thức. Mọi công thức toán học, mã nguồn, và tài liệu tham khảo đều được giữ nguyên bản gốc. Nếu phát hiện lỗi dịch thuật, vui lòng liên hệ người dịch hoặc mở issue trên repository.
+> **Lưu ý:** Bản dịch này nhằm mục đích giáo dục và phổ biến kiến thức. Mọi công thức toán học, mã nguồn và tài liệu tham khảo đều được giữ nguyên bản gốc. Nếu phát hiện lỗi dịch thuật, vui lòng liên hệ người dịch hoặc mở issue trên repository.
 
 ---
 

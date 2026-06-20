@@ -5,16 +5,16 @@ sidebar_label: "Chương 3: Thuật toán GOLD"
 
 # Chương 3: Thuật toán GOLD (General On-Policy Logit Distillation)
 
-GOLD giải quyết hai hạn chế chính khi thực hiện chưng cất giữa các mô hình có **tokenizer** khác nhau: **lệch chuỗi** (sequence misalignment) và **lệch từ vựng** (vocabulary misalignment).
+GOLD giải quyết hai hạn chế chính khi chưng cất giữa các mô hình có tokenizer khác nhau: **lệch chuỗi** (sequence misalignment) và **lệch từ vựng** (vocabulary misalignment).
 
 ## 1. Căn chỉnh chuỗi (Sequence Alignment)
 
 ### Vấn đề với ULD
 
-Hạn chế đầu tiên mà chúng tôi giải quyết là phương pháp căn chỉnh chuỗi của ULD, vốn chỉ đơn giản **cắt ngắn (truncate)** các chuỗi về độ dài token hóa nhỏ nhất. Cách tiếp cận đơn giản này gây ra hai vấn đề:
+Hạn chế đầu tiên là phương pháp căn chỉnh chuỗi của ULD — vốn chỉ đơn giản **cắt ngắn (truncate)** các chuỗi về độ dài token hóa nhỏ nhất. Cách tiếp cận này gây ra hai vấn đề:
 
 1. **Mất thông tin ở cuối văn bản:** Các token ở phần cuối chuỗi dài hơn bị bỏ qua hoàn toàn.
-2. **Lệch ngữ nghĩa giữa các token:** Các token tại cùng một vị trí trong chuỗi (sequence index) có thể mang ý nghĩa ngữ nghĩa (semantic meaning) hoàn toàn khác nhau.
+2. **Lệch ngữ nghĩa giữa các token:** Các token tại cùng một vị trí trong chuỗi có thể mang ý nghĩa hoàn toàn khác nhau.
 
 ```mermaid
 flowchart TB
@@ -38,9 +38,9 @@ flowchart TB
 
 ### Giải pháp: Gộp token (Token Merging)
 
-Thay vì cắt ngắn, phương pháp của chúng tôi xác định các **phép gộp token (token merges)** cần thiết để cân bằng độ dài chuỗi cho cả hai tokenizer. Sau đó, chúng tôi **gộp xác suất** tại các vị trí tương ứng bằng cách nhân phân phối biên (marginal distribution) với các xác suất có điều kiện vô hướng (scalar conditional probabilities) của các token tiếp theo thực tế.
+Thay vì cắt ngắn, phương pháp của chúng tôi xác định các **phép gộp token** cần thiết để cân bằng độ dài chuỗi cho cả hai tokenizer, rồi **gộp xác suất** tại các vị trí tương ứng bằng cách nhân phân phối biên (marginal distribution) với các xác suất có điều kiện vô hướng của token tiếp theo.
 
-Sử dụng xác suất có điều kiện và **quy tắc nhân xác suất (product rule)**, chúng tôi có thể gộp các xác suất và đảm bảo căn chỉnh chuỗi bất kể sự khác biệt giữa các tokenizer:
+Sử dụng xác suất có điều kiện và **quy tắc nhân xác suất**, chúng tôi có thể gộp xác suất và đảm bảo căn chỉnh chuỗi bất kể sự khác biệt giữa các tokenizer:
 
 $$P_{\text{merged}}(y) = P(y \mid x) \times P(\text{token}_1 \mid x) \times P(\text{token}_2 \mid \text{token}_1, x) \times \dots$$
 
@@ -70,17 +70,17 @@ Phương pháp gộp token đảm bảo **không mất thông tin** và **căn c
 
 ### Vấn đề với phương pháp sắp xếp của ULD
 
-ULD xử lý sự khác biệt từ vựng bằng cách **sắp xếp (sorting)** các logits theo thứ tự giảm dần và so khớp theo vị trí. Tuy nhiên, cách này không tận dụng được thông tin rằng nhiều token thực sự **tồn tại trong cả hai từ vựng** — chỉ khác mã ID.
+ULD xử lý sự khác biệt từ vựng bằng cách **sắp xếp (sorting)** các logit theo thứ tự giảm dần và so khớp theo vị trí. Tuy nhiên, cách này bỏ qua thực tế rằng nhiều token **tồn tại trong cả hai từ vựng** — chỉ khác mã ID.
 
 ### Giải pháp: Ánh xạ một-một kết hợp sắp xếp dự phòng
 
-Cải tiến thứ hai của chúng tôi cải thiện việc căn chỉnh trong **chiều từ vựng** bằng cách thay thế thao tác sắp xếp bằng một thao tác tận dụng **ánh xạ một-một (one-to-one mapping)** tiềm năng giữa các tokenizer.
+Cải tiến thứ hai của chúng tôi thay thế thao tác sắp xếp bằng một thao tác tận dụng **ánh xạ một-một (one-to-one mapping)** tiềm năng giữa các tokenizer.
 
 Quy trình hoạt động như sau:
 
 1. **Tìm ánh xạ trực tiếp:** Xác định các token tồn tại trong cả hai từ vựng và tạo ánh xạ 1:1 giữa chúng.
-2. **Áp dụng hàm mất mát GKD:** Với các token đã ánh xạ, áp dụng trực tiếp hàm mất mát GKD (chính xác và hiệu quả).
-3. **Dự phòng bằng ULD:** Với các token **không có ánh xạ** (unmatched tokens), quay lại sử dụng quy trình sắp xếp từ ULD.
+2. **Áp dụng hàm mất mát GKD:** Với các token đã ánh xạ, áp dụng trực tiếp hàm mất mát GKD.
+3. **Dự phòng bằng ULD:** Với các token **không có ánh xạ**, quay lại dùng quy trình sắp xếp từ ULD.
 
 ```mermaid
 flowchart TB
@@ -105,7 +105,7 @@ flowchart TB
 
 ### Hàm mất mát tổng hợp của GOLD
 
-Hàm mất mát của GOLD là kết quả của việc **cộng** $\mathcal{L}_{GKD}$ từ các token có ánh xạ một-một và $\mathcal{L}_{ULD}$ từ các token không có ánh xạ:
+Hàm mất mát của GOLD là tổng của $\mathcal{L}_{GKD}$ từ các token có ánh xạ một-một và $\mathcal{L}_{ULD}$ từ các token không có ánh xạ:
 
 $$\mathcal{L}_{GOLD} = \mathcal{L}_{GKD}^{\text{(matched)}} + \mathcal{L}_{ULD}^{\text{(unmatched)}}$$
 

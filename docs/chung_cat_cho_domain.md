@@ -5,18 +5,18 @@ sidebar_label: 'Chương 7: Chưng cất cho Domain cụ thể'
 
 # Chương 7: Chưng cất Tri thức cho Domain Cụ thể
 
-Chương này trình bày cách áp dụng on-policy distillation cho các **domain cụ thể** (domain-specific), giải quyết bài toán quan trọng: làm sao cải thiện hiệu suất trên domain chuyên biệt mà không mất đi khả năng theo dõi hướng dẫn (instruction following) tổng quát.
+Chương này trình bày cách áp dụng on-policy distillation cho các **domain cụ thể**, giải quyết bài toán quan trọng: làm sao cải thiện hiệu suất trên domain chuyên biệt mà không đánh mất khả năng instruction following tổng quát.
 
 ---
 
 ## 7.1 Bài toán: Mất Khả năng Tổng quát khi Tinh chỉnh Domain
 
-Trong bài blog của **Thinking Machines**, các tác giả đã chưng cất mô hình ngôn ngữ cho **personalisation** (cá nhân hóa). Họ cải thiện mô hình Qwen3-8B trên một tập dữ liệu domain nội bộ và **khôi phục lại khả năng** trên **IFEval** — benchmark đánh giá khả năng theo dõi hướng dẫn (instruction following benchmark).
+Trong bài blog của **Thinking Machines**, các tác giả đã chưng cất mô hình ngôn ngữ cho bài toán cá nhân hóa (personalisation). Họ cải thiện Qwen3-8B trên một tập dữ liệu nội bộ và **khôi phục lại** điểm số trên **IFEval** — benchmark đánh giá khả năng instruction following.
 
-> **Vấn đề phổ biến:** Các mô hình thường **mất khả năng theo dõi hướng dẫn** khi được tinh chỉnh cho domain cụ thể bằng SFT. Đây là hiện tượng **catastrophic forgetting** (quên thảm khốc) — mô hình học tốt trên domain mới nhưng quên đi kiến thức tổng quát đã có.
+> **Vấn đề phổ biến:** Các mô hình thường **mất khả năng instruction following** khi được fine-tune cho domain cụ thể bằng SFT. Đây là hiện tượng **catastrophic forgetting** — mô hình học tốt trên domain mới nhưng quên đi kiến thức tổng quát đã có.
 
-Thinking Machines giải quyết vấn đề này bằng cách **xen kẽ các giai đoạn** (interleaving phases):
-1. **Continued pre-training** (tiền huấn luyện tiếp tục) trên dữ liệu domain cụ thể — gọi là **mid-training**
+Thinking Machines giải quyết vấn đề này bằng cách **xen kẽ hai giai đoạn**:
+1. **Continued pre-training** trên dữ liệu domain cụ thể — còn gọi là **mid-training**
 2. **On-policy Distillation** với tập dữ liệu chat chất lượng cao
 
 ```mermaid
@@ -39,7 +39,7 @@ graph LR
 
 ## 7.2 Tái tạo trong TRL với Mô hình và Dữ liệu Mở
 
-Chúng tôi tái tạo quy trình trên trong **TRL** (Transformer Reinforcement Learning library) sử dụng các mô hình và tập dữ liệu mở:
+Chúng tôi tái tạo quy trình trên trong **TRL** sử dụng các mô hình và tập dữ liệu mở:
 
 | Thành phần | Tài nguyên sử dụng | Mục đích |
 |:---|:---|:---|
@@ -53,7 +53,7 @@ Chúng tôi tái tạo quy trình trên trong **TRL** (Transformer Reinforcement
 
 ## 7.3 Bước 1: Supervised Fine-Tuning trên Domain Code
 
-Chúng tôi tinh chỉnh mô hình trên tập dữ liệu `open-r1/codeforces`:
+Chúng tôi fine-tune mô hình trên tập dữ liệu `open-r1/codeforces`:
 
 ### Lệnh Huấn luyện SFT
 
@@ -92,24 +92,24 @@ accelerate launch \
 | `gradient_accumulation_steps` | `32` | Tích lũy gradient qua 32 bước để tăng effective batch size |
 | `max_length` | `16384` | Cho phép chuỗi dài (code thường dài) |
 | `gradient_checkpointing` | Bật | Tiết kiệm bộ nhớ GPU |
-| `use_liger_kernel` | Bật | Tối ưu hóa kernel cho hiệu suất huấn luyện |
+| `use_liger_kernel` | Bật | Tối ưu kernel cho hiệu suất huấn luyện |
 
 ### Kết quả SFT
 
-SFT đã **cải thiện hiệu suất domain code** nhưng đồng thời **làm giảm khả năng instruction following**:
+SFT **cải thiện hiệu suất trên domain code** nhưng đồng thời **làm giảm khả năng instruction following**:
 
 | Benchmark | Trước SFT (Baseline) | Sau SFT | Thay đổi |
 |:---|:---:|:---:|:---:|
 | **LiveCodeBench** | 35.1% | 40.3% | 📈 **+5.2%** |
 | **IFEval** | 83.4% | 79.5% | 📉 **-3.9%** |
 
-> **Quan sát:** Đúng như dự đoán, SFT trên domain cụ thể cải thiện hiệu suất domain (LiveCodeBench +5.2%) nhưng gây suy giảm khả năng tổng quát (IFEval -3.9%). Đây chính là hiện tượng catastrophic forgetting mà chúng ta cần giải quyết.
+> **Quan sát:** Đúng như dự đoán, SFT cải thiện domain (LiveCodeBench +5.2%) nhưng gây suy giảm khả năng tổng quát (IFEval -3.9%). Đây chính là catastrophic forgetting cần giải quyết.
 
 ---
 
 ## 7.4 Bước 2: Generalized Knowledge Distillation để Khôi phục IFEval
 
-Bắt đầu từ **checkpoint SFT**, chúng tôi sử dụng **GKDTrainer** với tập dữ liệu chat tổng quát:
+Bắt đầu từ **checkpoint SFT**, chúng tôi dùng **GKDTrainer** với tập dữ liệu chat tổng quát:
 
 ### Lệnh Huấn luyện GKD
 
@@ -174,8 +174,6 @@ accelerate launch \
 
 ## 7.5 Kết quả Tổng hợp
 
-Bảng dưới đây tổng hợp kết quả qua toàn bộ quy trình:
-
 | Giai đoạn | LiveCodeBench | IFEval | Ghi chú |
 |:---|:---:|:---:|:---|
 | **Baseline** (Qwen3-4B) | 35.1% | 83.4% | Mô hình gốc |
@@ -198,16 +196,16 @@ graph TD
 
 ### Phân tích Kết quả
 
-- **SFT trên Codeforces** cải thiện LiveCodeBench từ 35.1% lên 40.3% (+5.2 điểm phần trăm), nhưng IFEval giảm từ 83.4% xuống 79.5% (-3.9 điểm phần trăm).
-- **GKD trên Tulu-3** khôi phục IFEval từ 79.5% lên 82.8% (+3.3 điểm phần trăm) trong khi chỉ giảm nhẹ LiveCodeBench từ 40.3% xuống 39.8% (-0.5 điểm phần trăm — không đáng kể).
+- **SFT trên Codeforces** cải thiện LiveCodeBench từ 35.1% lên 40.3% (+5.2 điểm), nhưng IFEval giảm từ 83.4% xuống 79.5% (-3.9 điểm).
+- **GKD trên Tulu-3** khôi phục IFEval từ 79.5% lên 82.8% (+3.3 điểm), trong khi LiveCodeBench chỉ giảm nhẹ từ 40.3% xuống 39.8% (-0.5 điểm — không đáng kể).
 
-> **Kết luận:** Quy trình **SFT → GKD** cho phép chúng ta **cải thiện domain cụ thể** (LiveCodeBench: 35.1% → 39.8%) **đồng thời duy trì khả năng tổng quát** (IFEval: 83.4% → 82.8%), với mức suy giảm IFEval gần như không đáng kể (-0.6 điểm).
+> **Kết luận:** Quy trình **SFT → GKD** cho phép **cải thiện domain cụ thể** (LiveCodeBench: 35.1% → 39.8%) **đồng thời duy trì khả năng tổng quát** (IFEval: 83.4% → 82.8%), với mức suy giảm IFEval gần như không đáng kể (-0.6 điểm).
 
 ---
 
 ## 7.6 Quy trình Tổng quát cho Bất kỳ Domain nào
 
-Quy trình này có thể được áp dụng cho **bất kỳ domain cụ thể** nào:
+Quy trình này có thể áp dụng cho **bất kỳ domain cụ thể** nào:
 
 ```mermaid
 graph TD
@@ -227,10 +225,10 @@ graph TD
 2. **SFT** trên dữ liệu domain cụ thể → cải thiện hiệu suất domain
 3. **GKD/GOLD** trên dữ liệu instruction following chất lượng cao → khôi phục khả năng tổng quát
 4. Đánh giá trên cả benchmark domain và benchmark tổng quát
-5. Lặp lại nếu cần thiết
+5. Lặp lại nếu cần
 
 ---
 
 ## Tổng kết Chương
 
-Chương này chứng minh rằng on-policy distillation không chỉ hữu ích cho việc nén mô hình, mà còn là công cụ mạnh mẽ để **chống lại catastrophic forgetting** trong tinh chỉnh domain cụ thể. Quy trình SFT → GKD cho phép đạt được **cải thiện domain** và **duy trì khả năng tổng quát** đồng thời.
+Chương này chứng minh rằng on-policy distillation không chỉ hữu ích cho việc nén mô hình, mà còn là công cụ mạnh mẽ để **chống lại catastrophic forgetting** khi fine-tune domain cụ thể. Quy trình SFT → GKD cho phép đạt được **cải thiện domain** và **duy trì khả năng tổng quát** cùng một lúc.
